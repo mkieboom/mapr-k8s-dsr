@@ -1,0 +1,192 @@
+# MapR Data Science Refinery Container
+
+# MapR Apps Namespace
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mapr-apps
+  labels:
+    name: mapr-apps
+
+# Service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mapr-k8-dsr
+  namespace: mapr-apps
+spec:
+  type: NodePort
+  selector:
+    app: mapr-k8s-dsr
+  ports:
+  - name: dsr-zeppelin-ui
+    protocol: TCP
+    port: 30011
+    nodePort: 30011
+  - name: dsr-livy-port-1
+    protocol: TCP
+    port: 30000
+    nodePort: 30000
+  - name: dsr-livy-port-2
+    protocol: TCP
+    port: 30001
+    nodePort: 30001
+  - name: dsr-livy-port-3
+    protocol: TCP
+    port: 30002
+    nodePort: 30002
+  - name: dsr-livy-port-4
+    protocol: TCP
+    port: 30003
+    nodePort: 30003
+  - name: dsr-livy-port-5
+    protocol: TCP
+    port: 30004
+    nodePort: 30004
+  - name: dsr-livy-port-6
+    protocol: TCP
+    port: 30005
+    nodePort: 30005
+  - name: dsr-livy-port-7
+    protocol: TCP
+    port: 30006
+    nodePort: 30006
+  - name: dsr-livy-port-8
+    protocol: TCP
+    port: 30007
+    nodePort: 30007
+  - name: dsr-livy-port-9
+    protocol: TCP
+    port: 30008
+    nodePort: 30008
+  - name: dsr-livy-port-10
+    protocol: TCP
+    port: 30009
+    nodePort: 30009
+  - name: dsr-livy-port-11
+    protocol: TCP
+    port: 30010
+    nodePort: 30010
+  - name: dsr-spark-port-1
+    protocol: TCP
+    port: 31000
+    nodePort: 31000
+  - name: dsr-spark-port-2
+    protocol: TCP
+    port: 31001
+    nodePort: 31001
+  - name: dsr-spark-port-3
+    protocol: TCP
+    port: 31002
+    nodePort: 31002
+  - name: dsr-spark-port-4
+    protocol: TCP
+    port: 31003
+    nodePort: 31003
+  - name: dsr-spark-port-5
+    protocol: TCP
+    port: 31004
+    nodePort: 31004
+  - name: dsr-spark-port-6
+    protocol: TCP
+    port: 31005
+    nodePort: 31005
+  - name: dsr-spark-port-7
+    protocol: TCP
+    port: 31006
+    nodePort: 31006
+  - name: dsr-spark-port-8
+    protocol: TCP
+    port: 31007
+    nodePort: 31007
+  - name: dsr-spark-port-9
+    protocol: TCP
+    port: 31008
+    nodePort: 31008
+  - name: dsr-spark-port-10
+    protocol: TCP
+    port: 31009
+    nodePort: 31009
+  - name: dsr-spark-port-11
+    protocol: TCP
+    port: 31010
+    nodePort: 31010
+
+# Ticket to authenticate with MapR Converged Data Platform
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: mapr-apps
+  name: dsr-ticket-secret
+type: Opaque
+data:
+# To create a Ticket:
+# 1. maprlogin password -user mapr
+# 2. echo -n $(cat /tmp/maprticket_####) | base64
+# 3. combine 6 lines base64 output in single CONTAINER_TICKET line:
+  CONTAINER_TICKET: ZGVtby5tYXByLmNvbSAwckdXdW5peTEvLzRnM2VnN1p6YjJnZWNaS2IxUU0yK1JVNXIxYnI4STF0MGZ3VEhaRWpYbk1NczgweEJXK2ZNRXpUZnNkVy84OUVIdG9oaUVORW83QjhJZDkxMU5Sa0pacTlmbzZQdW11VmEvSjNjL2hPaEEvc3U1TlJaVGVKYlR0SUhBNm9hcnJJT0xiWjN5L0FXZldadEhVdEhhMDZBcW5MSlFGSlNwOVBuNlNtWnB4Mkd6VzVibk1vZDlTaURYV1lUdXhFYVVmQTBEaGdiTDZ1bElhUndERm1uQitJcHJRR2FPQjJXMWR3bjJxTHVSZjhoOUtrUUVOYWI3eldDTVNWR012TUR0V1Eyc3pvb2swbmRTTWJpRXExVmtDND0=
+
+# Pod
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  namespace: mapr-apps
+  name: mapr-k8s-dsr
+  labels:
+      app: mapr-k8s-dsr
+spec:
+  containers:
+  - name: mapr-k8s-dsr
+    imagePullPolicy: Always
+    image: maprtech/data-science-refinery
+    securityContext:
+      capabilities:
+        add: ["SYS_ADMIN" , "SYS_RESOURCE"]
+    resources:
+      requests:
+        memory: "2Gi"
+        cpu: "500m"
+    env:
+    - name: MAPR_MOUNT_PATH
+      value: /mapr
+    - name: MAPR_CLUSTER
+      value: demo.mapr.com
+    - name: MAPR_CLDB_HOSTS
+      value: 172.16.4.104
+    - name: MAPR_CONTAINER_USER
+      value: mapr
+    - name: MAPR_CONTAINER_GROUP
+      value: mapr
+    - name: MAPR_CONTAINER_PASSWORD
+      value: mapr
+    - name: HOST_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.hostIP
+    - name: MAPR_TICKETFILE_LOCATION
+      value: "/tmp/mapr_ticket/CONTAINER_TICKET"
+    - name: ZEPPELIN_SSL_PORT
+      value: "30011"
+    - name: LIVY_RSC_PORT_RANGE
+      value: "30000~30010"
+    - name: SPARK_PORT_RANGE
+      value: "31000~31010"
+    - name: DEPLOY_MODE
+      value: kubernetes
+    volumeMounts:
+    - name: fuse
+      mountPath: /dev/fuse
+    - name: maprticket
+      mountPath: /tmp/mapr_ticket
+      readOnly: true
+  volumes:
+  - name: fuse
+    hostPath:
+      path: /dev/fuse
+  - name: maprticket
+    secret:
+      secretName: dsr-ticket-secret
