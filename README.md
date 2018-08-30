@@ -7,5 +7,5 @@ Kubernetes and MapR cluster
 ```
 # Change the MapR specific parameters in the yaml file to reflect your MapR cluster configuration
   
-kubectl create -f mapr-k8-dsr-.yaml
+kubectl create -f mapr-k8-dsr.yaml
 ```
