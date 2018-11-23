@@ -125,8 +125,7 @@ type: Opaque
 data:
 # To create a Ticket:
 # 1. maprlogin password -user mapr
-# 2. echo -n $(cat /tmp/maprticket_####) | base64
-# 3. combine 6 lines base64 output in single CONTAINER_TICKET line:
+# 2. echo -n $(cat /tmp/maprticket_####) | base64 -w 0
   CONTAINER_TICKET: ZGVtby5tYXByLmNvbSAwckdXdW5peTEvLzRnM2VnN1p6YjJnZWNaS2IxUU0yK1JVNXIxYnI4STF0MGZ3VEhaRWpYbk1NczgweEJXK2ZNRXpUZnNkVy84OUVIdG9oaUVORW83QjhJZDkxMU5Sa0pacTlmbzZQdW11VmEvSjNjL2hPaEEvc3U1TlJaVGVKYlR0SUhBNm9hcnJJT0xiWjN5L0FXZldadEhVdEhhMDZBcW5MSlFGSlNwOVBuNlNtWnB4Mkd6VzVibk1vZDlTaURYV1lUdXhFYVVmQTBEaGdiTDZ1bElhUndERm1uQitJcHJRR2FPQjJXMWR3bjJxTHVSZjhoOUtrUUVOYWI3eldDTVNWR012TUR0V1Eyc3pvb2swbmRTTWJpRXExVmtDND0=
 
 # Pod
